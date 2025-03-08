@@ -1,14 +1,21 @@
-console.log('D3 Version:', d3.version);
 const margin = {top: 40, right: 40, bottom: 40, left: 60};
 const width = 600 - margin.left - margin.right;
 const height = 400 - margin.top - margin.bottom;
 
 let allData = []
-let xVar = 'TMAX', yVar = 'PRCP', sizeVar = 'AWND'
+let xVar = 'TAVG', yVar = 'AWND', sizeVar = 'PRCP'
 let xScale, yScale, sizeScale
-const options = ['TMAX', 'TMIN', 'TAVG', 'PRCP', 'AWND']
+const options = [
+    "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
+    "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
+    "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
+    "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
+    "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"
+  ];
 const t = 1000;
 let states = [];
+let months = [];
+let currState = 'MD'
 let colorScale;
 
 const svg = d3.select('#vis')
@@ -22,17 +29,22 @@ function init(){
     d3.csv("./data/weather.csv", d => ({
         station: d.station,
         state: d.state,
-        month: +d.date.substring(4,6),
-        TMIN: +d.TMIN || 0,
-        TMAX: +d.TMAX || 0,
-        TAVG: +d.TAVG || (+d.TMIN + +d.TMAX) / 2 || 0,
-        PRCP: +d.PRCP || 0,
-        AWND: +d.AWND || 0
+        month: d.date.substring(4,6),
+        TMIN: +d.TMIN,
+        TMAX: +d.TMAX,
+        TAVG: (+d.TAVG > 0) ? +d.TAVG : null,
+        PRCP: (+d.PRCP != 0) ? +d.PRCP : null,
+        AWND: +d.AWND
     }))
     .then(data => {
-        allData = data.filter(d => !isNaN(d[xVar]) && !isNaN(d[yVar]) && !isNaN(d[sizeVar]));
+        allData = data.filter(d => 
+            d[xVar] !== null && d[yVar] !== null && d[sizeVar] !== null &&
+            !isNaN(d[xVar]) && !isNaN(d[yVar]) && !isNaN(d[sizeVar])
+        );
         states = [...new Set(data.map(d => d.state))];
-        colorScale = d3.scaleOrdinal(states, d3.schemeSet2);
+        months = [...new Set(data.map(d => d.month))];
+        colorScale = d3.scaleOrdinal(months, d3.schemeSet3);
+        setupSelector();
         updateAxes();
         updateVis();
         addLegend();
@@ -84,9 +96,33 @@ function updateAxes(){
         .attr('class', 'labels')
 }
 
+function setupSelector(){
+    d3.selectAll('.variable')
+   // loop over each dropdown button
+    .each(function() {
+        d3.select(this).selectAll('myOptions')
+        .data(options)
+        .enter()
+        .append('option')
+        .text(d => d) // The displayed text
+        .attr("value",d => d) // The actual value used in the code
+    })
+    .on("change", function (event) {
+        // Placeholder: we’ll change xVar, yVar, or sizeVar here
+        id = d3.select(this).property("id")
+        val = d3.select(this).property("value")
+        currState = val
+        updateAxes();
+        updateVis();
+    })
+d3.select('#state').property('value', currState)
+}
+
 function updateVis(){
+    let currentData = allData.filter(d => d.state === currState)
+    console.log(currState)
     svg.selectAll('.points')
-        .data(allData, d => d.state)
+        .data(currentData, d => d.state)
         .join(
             enter => enter
                 .append('circle')
@@ -94,12 +130,14 @@ function updateVis(){
                 .attr('cx', d => xScale(d[xVar]))
                 .attr('cy', d => yScale(d[yVar]))
                 .attr('r', d => sizeScale(d[sizeVar]))
-                .style('fill', d => colorScale(d.state))
+                .style('fill', d => colorScale(d.month))
                 .style('opacity', 0.5)
                 .on('mouseover', function(event, d) {
                     d3.select('#tooltip')
                         .style("display", 'block')
-                        .html(`<strong>${d.PRCP}</strong><br/>State: ${d.state}`)
+                        .html(`Precipitation: ${d.PRCP.toFixed(2)} in
+                        <br/>Avg Wind: ${d.AWND.toFixed(2)} mph
+                        <br/>Avg Temp: ${d.TAVG.toFixed(2)} F`)
                         .style("left", (event.pageX + 20) + "px")
                         .style("top", (event.pageY - 28) + "px");
                     d3.select(this).style('stroke', 'black').style('stroke-width', '2px');
