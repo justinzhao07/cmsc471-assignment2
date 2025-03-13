@@ -30,9 +30,11 @@ function init(){
         station: d.station,
         state: d.state,
         month: d.date.substring(4,6),
-        TMIN: +d.TMIN,
-        TMAX: +d.TMAX,
+        TMIN: (+d.TMIN != 0) ? +d.TMIN : null,
+        TMAX: (+d.TMAX != 0) ? +d.TMAX : null,
         TAVG: (+d.TAVG > 0) ? +d.TAVG : null,
+        SNOW: (+d.SNOW != 0) ? +d.SNOW : null,
+        SNWD: (+d.SNWD != 0) ? +d.SNWD : null,
         PRCP: (+d.PRCP != 0) ? +d.PRCP : null,
         AWND: +d.AWND
     }))
