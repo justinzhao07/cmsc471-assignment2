@@ -209,7 +209,7 @@ function addLegend() {
 
     svg.append("rect")
         .attr("x", width - legendWidth - 20)
-        .attr("y", height - 330)
+        .attr("y", height - 450)
         .attr("width", legendWidth)
         .attr("height", legendHeight)
         .style("fill", "url(#legend-gradient)")
@@ -217,21 +217,21 @@ function addLegend() {
 
     svg.append("text")
         .attr("x", width - legendWidth - 20)
-        .attr("y", height - 300)
+        .attr("y", height - 420)
         .attr("text-anchor", "start")
         .text("Less Snow")
         .attr("class", "legend");
 
     svg.append("text")
         .attr("x", width - 20)
-        .attr("y", height - 300)
+        .attr("y", height - 420)
         .attr("text-anchor", "end")
         .text("More Snow")
         .attr("class", "legend");
 
     svg.append("rect")
         .attr("x", width - 80)
-        .attr("y", height - 270)
+        .attr("y", height - 380)
         .attr("width", 10)
         .attr("height", 10)
         .style("fill", "green")
@@ -240,7 +240,7 @@ function addLegend() {
 
     svg.append("text")
         .attr("x", width - 30)
-        .attr("y", height - 260)
+        .attr("y", height - 370)
         .attr("text-anchor", "end")
         .text("Rain")
         .attr("class", "legend");
