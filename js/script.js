@@ -33,7 +33,7 @@ function init(){
         month: +d.date.substring(4,6),
         TMIN: (+d.TMIN != 0) ? +d.TMIN : null,
         TMAX: (+d.TMAX != 0) ? +d.TMAX : null,
-        TAVG: (+d.TAVG > 0) ? +d.TAVG : null,
+        TAVG: (+d.TAVG != 0) ? +d.TAVG : null,
         SNOW: (+d.SNOW != 0) ? +d.SNOW : null,
         SNWD: (+d.SNWD != 0) ? +d.SNWD : null,
         PRCP: (+d.PRCP != 0) ? +d.PRCP : null,
@@ -61,7 +61,7 @@ function updateAxes(){
     const xMax = d3.max(allData, d => d[xVar]);
 
     xScale = d3.scaleLinear()
-        .domain([d3.min(allData, d => d[xVar]), d3.max(allData, d => d[xVar])])
+        .domain([-10, d3.max(allData, d => d[xVar])])
         .range([0, width]);
 
     svg.append("g")
@@ -88,7 +88,6 @@ function updateAxes(){
         .text("Average Temp (F)") // Displays the current x-axis variable
         .attr('class', 'labels')
     
-    // Y-axis label (rotated)
     svg.append("text")
         .attr("transform", "rotate(-90)")
         .attr("x", -height / 2)
@@ -103,37 +102,35 @@ const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep
 function setupSelector(){
 let slider = d3
     .sliderHorizontal()
-    .min(1) // setup the range
-    .max(10) // setup the range
+    .min(1)
+    .max(10)
     .step(1)
-    .width(width)  // Widen the slider if needed
+    .width(width)
     .tickFormat(d => monthNames[d - 1])
     .displayValue(false)
     .on('onchange', (val) => {
-        currMonth = +val // Update the year
-       updateVis() // Refresh the chart
+        currMonth = +val
+       updateVis()
     });
 
 d3.select('#slider')
     .append('svg')
-    .attr('width', width)  // Adjust width if needed
+    .attr('width', width)
     .attr('height', 100)
     .append('g')
     .attr('transform', 'translate(30,30)') 
     .call(slider);
 
     d3.selectAll('.variable')
-   // loop over each dropdown button
     .each(function() {
         d3.select(this).selectAll('myOptions')
         .data(options)
         .enter()
         .append('option')
-        .text(d => d) // The displayed text
-        .attr("value",d => d) // The actual value used in the code
+        .text(d => d)
+        .attr("value",d => d)
     })
     .on("change", function (event) {
-        // Placeholder: we’ll change xVar, yVar, or sizeVar here
         id = d3.select(this).property("id")
         val = d3.select(this).property("value")
         currState = val
