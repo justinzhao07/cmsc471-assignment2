@@ -3,8 +3,9 @@ const width = 600 - margin.left - margin.right;
 const height = 400 - margin.top - margin.bottom;
 
 let allData = []
-let xVar = 'TAVG', yVar = 'AWND', sizeVar = 'PRCP'
+let xVar = 'TAVG', yVar = 'AWND', sizeVar = 'PRCP', colorVar = 'SNOW'
 let xScale, yScale, sizeScale
+let currMonth = 1
 const options = [
     "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
     "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
@@ -16,7 +17,7 @@ const t = 1000;
 let states = [];
 let months = [];
 let currState = 'MD'
-let colorScale;
+const colorScale = d3.scaleSequential(d3.interpolateBlues);
 
 const svg = d3.select('#vis')
     .append('svg')
@@ -34,16 +35,16 @@ function init(){
         TMAX: +d.TMAX,
         TAVG: (+d.TAVG > 0) ? +d.TAVG : null,
         PRCP: (+d.PRCP != 0) ? +d.PRCP : null,
-        AWND: +d.AWND
+        AWND: (+d.AWND > 0) ? +d.AWND : null,
+        SNOW: (+d.SNOW > 0) ? +d.SNOW : null
     }))
     .then(data => {
         allData = data.filter(d => 
-            d[xVar] !== null && d[yVar] !== null && d[sizeVar] !== null &&
-            !isNaN(d[xVar]) && !isNaN(d[yVar]) && !isNaN(d[sizeVar])
+            d[xVar] !== null && d[yVar] !== null && d[sizeVar] !== null
+            && !isNaN(d[xVar]) && !isNaN(d[yVar]) && !isNaN(d[sizeVar])
         );
         states = [...new Set(data.map(d => d.state))];
         months = [...new Set(data.map(d => d.month))];
-        colorScale = d3.scaleOrdinal(months, d3.schemeSet3);
         setupSelector();
         updateAxes();
         updateVis();
@@ -69,7 +70,8 @@ function updateAxes(){
         .call(d3.axisBottom(xScale));
 
     yScale = d3.scaleLinear()
-        .domain([0, d3.max(allData, d => d[yVar])])
+        // .domain([0, d3.max(allData, d => d[yVar])])
+        .domain([0, 30])
         .range([height, 0]);
     svg.append('g')
         .attr('class', 'axis')
@@ -77,7 +79,7 @@ function updateAxes(){
 
     sizeScale = d3.scaleSqrt()
         .domain([0, d3.max(allData, d => d[sizeVar])])
-        .range([5, 20]);
+        .range([3, 20]);
 
     svg.append("text")
         .attr("x", width / 2)
@@ -97,6 +99,26 @@ function updateAxes(){
 }
 
 function setupSelector(){
+let slider = d3
+    .sliderHorizontal()
+    .min(1) // setup the range
+    .max(10) // setup the range
+    .step(1)
+    .width(width)  // Widen the slider if needed
+    .displayValue(false)
+    .on('onchange', (val) => {
+        currMonth = +val // Update the year
+       updateVis() // Refresh the chart
+    });
+
+d3.select('#slider')
+    .append('svg')
+    .attr('width', width)  // Adjust width if needed
+    .attr('height', 100)
+    .append('g')
+    .attr('transform', 'translate(30,30)') 
+    .call(slider);
+
     d3.selectAll('.variable')
    // loop over each dropdown button
     .each(function() {
@@ -119,8 +141,10 @@ d3.select('#state').property('value', currState)
 }
 
 function updateVis(){
-    let currentData = allData.filter(d => d.state === currState)
+    console.log(currMonth)
+    let currentData = allData.filter(d => d.state === currState && +d.month === currMonth)
     console.log(currState)
+    // colorScale.domain([d3.min(currentData, d => d[colorVar]), d3.max(currentData, d => d[colorVar])]);
     svg.selectAll('.points')
         .data(currentData, d => d.state)
         .join(
@@ -130,14 +154,20 @@ function updateVis(){
                 .attr('cx', d => xScale(d[xVar]))
                 .attr('cy', d => yScale(d[yVar]))
                 .attr('r', d => sizeScale(d[sizeVar]))
-                .style('fill', d => colorScale(d.month))
+                .style('fill', d => d[colorVar] < .01 ? "green" : colorScale(d[colorVar]))
                 .style('opacity', 0.5)
                 .on('mouseover', function(event, d) {
+                    let tooltipText = `Precipitation: ${d.PRCP.toFixed(2)} in
+                        <br/>Avg Wind: ${d.AWND.toFixed(2)} mph
+                        <br/>Avg Temp: ${d.TAVG.toFixed(2)} F`;
+
+                    if (d.SNOW !== null) {
+                        tooltipText += `<br/>Snow: ${d.SNOW.toFixed(2)} in`;
+                    }
+
                     d3.select('#tooltip')
                         .style("display", 'block')
-                        .html(`Precipitation: ${d.PRCP.toFixed(2)} in
-                        <br/>Avg Wind: ${d.AWND.toFixed(2)} mph
-                        <br/>Avg Temp: ${d.TAVG.toFixed(2)} F`)
+                        .html(tooltipText)
                         .style("left", (event.pageX + 20) + "px")
                         .style("top", (event.pageY - 28) + "px");
                     d3.select(this).style('stroke', 'black').style('stroke-width', '2px');
