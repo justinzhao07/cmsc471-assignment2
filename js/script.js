@@ -79,7 +79,7 @@ function updateAxes(){
 
     sizeScale = d3.scaleSqrt()
         .domain([0, d3.max(allData, d => d[sizeVar])])
-        .range([3, 20]);
+        .range([4, 20]);
 
     svg.append("text")
         .attr("x", width / 2)
@@ -228,6 +228,23 @@ function addLegend() {
         .attr("text-anchor", "end")
         .text("More Snow")
         .attr("class", "legend");
+
+    svg.append("rect")
+        .attr("x", width - 80)
+        .attr("y", height - 270)
+        .attr("width", 10)
+        .attr("height", 10)
+        .style("fill", "green")
+        .style('opacity', 0.5)
+        .attr("class", "legend");
+
+    svg.append("text")
+        .attr("x", width - 30)
+        .attr("y", height - 260)
+        .attr("text-anchor", "end")
+        .text("Rain")
+        .attr("class", "legend");
+
 }
 
 window.addEventListener('load', init);
