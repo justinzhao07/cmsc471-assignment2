@@ -6,16 +6,46 @@
     line-height: 1.8;
 }
 
-button {
-    padding: 8px 16px;
-    margin-right: 10px;
+h1 {
+    font-weight: 600;
+    font-size: 2.115rem
 }
+
+h2 {
+    font-weight: 600;
+    font-size: 1.8rem
+}
+
+h3 {
+    font-weight: 600;
+    font-size: 1.5rem
+}
+
+button {
+    background-color: lightgrey;
+    color: #000;
+    font-weight: normal;
+    font-size: smaller;
+    padding: 10px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background-color: darkgray; 
+    color: white;
+}
+
 
 /* Container styling for layout */
 .container {
     max-width: 800px;
     margin: 2rem auto;
     font-family: Arial, sans-serif;
+    justify-content: center;
+    width: 100%;
 }
 
 #vis svg {
@@ -50,4 +80,42 @@ button {
 .axis-label {
     font-size: 14px;
     font-weight: bold;
+}
+
+/* tab button styling */
+.tab {
+    overflow: hidden;
+}
+
+.tab button {
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.tab button.active {
+    background-color: lightskyblue;
+}
+
+.tabcontent {
+    display: none;
+    padding: 16px;
+    border: 1px solid #ccc;
+    width: 100%; /* Ensure it takes up full width */
+    box-sizing: border-box;
+}
+
+#Chart {
+    display: block;
+}
+
+h2{
+    padding-bottom: 6px;
+}
+
+p {
+    padding-bottom: 5px;
+}
+
+h3 {
+    padding-bottom: 2px;
 }
