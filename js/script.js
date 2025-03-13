@@ -1,6 +1,6 @@
-const margin = {top: 40, right: 40, bottom: 40, left: 60};
-const width = 600 - margin.left - margin.right;
-const height = 400 - margin.top - margin.bottom;
+const margin = {top: 80, right: 60, bottom: 60, left: 100};
+const width = 775 - margin.left - margin.right;
+const height = 575 - margin.top - margin.bottom;
 
 let allData = []
 let xVar = 'TAVG', yVar = 'AWND', sizeVar = 'PRCP', colorVar = 'SNOW'
@@ -103,7 +103,7 @@ function setupSelector(){
 let slider = d3
     .sliderHorizontal()
     .min(1)
-    .max(10)
+    .max(12)
     .step(1)
     .width(width)
     .tickFormat(d => monthNames[d - 1])
@@ -231,3 +231,21 @@ function addLegend() {
 }
 
 window.addEventListener('load', init);
+
+function openTab(evt, tabName) {
+            
+    var tabcontent = document.getElementsByClassName("tabcontent");
+    for (var i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+
+    var tablinks = document.getElementsByClassName("tablinks");
+    for (var i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+
+    document.getElementById(tabName).style.display = "block";
+    evt.currentTarget.className += " active";
+}
+
+document.getElementById("defaultOpen").click();
