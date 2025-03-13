@@ -8,8 +8,15 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+
     <div class="container"> <!-- Centers content and sets max width -->
         <h1>2017 Precipitation and Snow in the US</h1>
+        <div class="tab">
+            <button class="tablinks" onclick="openTab(event, 'Chart')" id="defaultOpen">Chart w/o Text</button>
+            <button class="tablinks" onclick="openTab(event, 'Writeup1')">Dataset and Design Decisions</button>
+            <button class="tablinks" onclick="openTab(event, 'Writeup2')">Interaction Techniques</button>
+            <button class="tablinks" onclick="openTab(event, 'Writeup3')">Development Process and References</button>
+        </div>
         <p id="value"></p>
         <div id="slider"></div>
         <div class="controls">
@@ -17,6 +24,33 @@
         <div id="vis"></div> <!--  Will hold our visualization (SVG) -->
     </div>
     <div id="tooltip" style="display:none"></div> 
+
+    <div id="Writeup1" class="tabcontent">
+        <h2>Introduction to the Dataset</h2>
+        <p>Our interactive visualization focuses on weather data, sourced from the Daily Weather in the U.S., 2017 dataset, which contains daily measurements of various weather conditions. We are particularly interested in analyzing several variables: precipitation, snowfall, and average temperature. By exploring the interactions between these variables, we aim to uncover meaningful patterns related to temperature and precipitation conditions across different times of the year.</p>
+        <p>The visualizations are designed to answer key questions about how weather conditions vary across time and how they interact with temperature fluctuations. We provide users with interactive tools to explore and uncover hidden patterns, using visual encodings and interactive techniques to make the analysis engaging and intuitive.</p>
+    
+        <h2>Rationale for Design Decisions</h2>
+        <p>Our visualization focuses on the precipitation and snow for different states during the different months. For visual encoding and design choices, we chose scatter plots as they provide a clear way to show relationships between two variables. Colors are used to represent key distinctions, such as snowfall versus rainfall in the scatterplot. The size of the data point also helps make the amount of precipitation clearer to the viewers, enabling them to understand our visualization better.</p>
+    </div>
+
+    <div id="Writeup2" class="tabcontent">
+        <h2>Interaction Techniques</h2>
+        
+        <h3>Month Slider (Dynamic Filter)</h3>
+        <p>The chart is connected by a month slider at the top, allowing users to filter the data by month or season. This interaction helps users focus on specific time periods to analyze temperature and precipitation patterns during specific months (e.g., winter storms or summer heatwaves).</p>
+        
+        <h3>Tooltips</h3>
+        <p>By hovering over data points in the chart, users receive detailed information for that specific day, including temperature, precipitation, and snowfall. This helps users dive deeper into specific weather events of interest.</p>
+    </div>
+
+    <div id="Writeup3" class="tabcontent">
+        <h2>Development Process and References</h2>
+        <p>This project was a collaborative effort between the team, where we divided the workload based on our strengths:</p>
+        <p>Justin was responsible for the coding and technical implementation of the scatterplots and interactive features. He used D3.js to create the visualizations and ensure that the interactions functioned properly. Jia Cheng's role was to brainstorm the combinations of data factors that would yield the most compelling insights and choosing the main one we wanted to focus on. He focused on ensuring the intuitiveness and effectiveness of the overall design, tying together the layout, color schemes, and point sizes. He was responsible for coding the tabs between the charts and the writeups, and also reviewed the code to ensure that the visualizations worked as expected and resolved any design-related issues that arose.</p>
+        <p>Overall, the team spent approximately xx hours developing the project. The most time-consuming aspect was (coding the brushing and linking interactions, ensuring smooth transitions and dynamic updates when the filters were applied). </p>
+        <p>References: Weather dataset - Daily Weather in the U.S., 2017 as provided in the assignment</p>
+    </div>
 
     <!-- Load D3.js -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
