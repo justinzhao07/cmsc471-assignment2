@@ -30,7 +30,7 @@ function init(){
     d3.csv("./data/weather.csv", d => ({
         station: d.station,
         state: d.state,
-        month: d.date.substring(4,6),
+        month: +d.date.substring(4,6),
         TMIN: (+d.TMIN != 0) ? +d.TMIN : null,
         TMAX: (+d.TMAX != 0) ? +d.TMAX : null,
         TAVG: (+d.TAVG > 0) ? +d.TAVG : null,
@@ -38,7 +38,6 @@ function init(){
         SNWD: (+d.SNWD != 0) ? +d.SNWD : null,
         PRCP: (+d.PRCP != 0) ? +d.PRCP : null,
         AWND: (+d.AWND > 0) ? +d.AWND : null,
-        SNOW: (+d.SNOW > 0) ? +d.SNOW : null
     }))
     .then(data => {
         allData = data.filter(d => 
@@ -60,7 +59,6 @@ function updateAxes(){
 
     const xMin = d3.min(allData, d => d[xVar]);
     const xMax = d3.max(allData, d => d[xVar]);
-    console.log('X-Axis Range:', xMin, xMax);
 
     xScale = d3.scaleLinear()
         .domain([d3.min(allData, d => d[xVar]), d3.max(allData, d => d[xVar])])
@@ -87,7 +85,7 @@ function updateAxes(){
         .attr("x", width / 2)
         .attr("y", height + margin.bottom - 10)
         .attr("text-anchor", "middle")
-        .text(xVar) // Displays the current x-axis variable
+        .text("Average Temp (F)") // Displays the current x-axis variable
         .attr('class', 'labels')
     
     // Y-axis label (rotated)
@@ -96,9 +94,11 @@ function updateAxes(){
         .attr("x", -height / 2)
         .attr("y", -margin.left + 25)
         .attr("text-anchor", "middle")
-        .text(yVar) // Displays the current y-axis variable
+        .text("Average Wind Speed (mph)") // Displays the current y-axis variable
         .attr('class', 'labels')
 }
+
+const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 function setupSelector(){
 let slider = d3
@@ -107,6 +107,7 @@ let slider = d3
     .max(10) // setup the range
     .step(1)
     .width(width)  // Widen the slider if needed
+    .tickFormat(d => monthNames[d - 1])
     .displayValue(false)
     .on('onchange', (val) => {
         currMonth = +val // Update the year
@@ -143,10 +144,8 @@ d3.select('#state').property('value', currState)
 }
 
 function updateVis(){
-    console.log(currMonth)
+    svg.selectAll('.points').remove();
     let currentData = allData.filter(d => d.state === currState && +d.month === currMonth)
-    console.log(currState)
-    // colorScale.domain([d3.min(currentData, d => d[colorVar]), d3.max(currentData, d => d[colorVar])]);
     svg.selectAll('.points')
         .data(currentData, d => d.state)
         .join(
@@ -190,8 +189,48 @@ function updateVis(){
         );
 }
 
-function addLegend(){
-    let size = 10;
+function addLegend() {
+    svg.selectAll(".legend").remove();
+
+    const legendWidth = 200;
+    const legendHeight = 10;
+
+    const defs = svg.append("defs");
+    const linearGradient = defs.append("linearGradient")
+        .attr("id", "legend-gradient")
+        .attr("x1", "0%")
+        .attr("y1", "0%")
+        .attr("x2", "100%")
+        .attr("y2", "0%");
+
+    linearGradient.selectAll("stop")
+        .data(d3.range(0, 1.1, 0.2))
+        .enter()
+        .append("stop")
+        .attr("offset", d => d * 100 + "%")
+        .attr("stop-color", d => d3.interpolateBlues(d));
+
+    svg.append("rect")
+        .attr("x", width - legendWidth - 20)
+        .attr("y", height - 330)
+        .attr("width", legendWidth)
+        .attr("height", legendHeight)
+        .style("fill", "url(#legend-gradient)")
+        .attr("class", "legend");
+
+    svg.append("text")
+        .attr("x", width - legendWidth - 20)
+        .attr("y", height - 300)
+        .attr("text-anchor", "start")
+        .text("Less Snow")
+        .attr("class", "legend");
+
+    svg.append("text")
+        .attr("x", width - 20)
+        .attr("y", height - 300)
+        .attr("text-anchor", "end")
+        .text("More Snow")
+        .attr("class", "legend");
 }
 
 window.addEventListener('load', init);
